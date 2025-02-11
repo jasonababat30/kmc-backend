@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', userController.getAllUsers)
 
 // Get Specific
-router.get('/:id', userController.getSpecificUser)
+router.get('/:id', userController.getCurrentUser, userController.getSpecificUser)
 
 // Create
 router.post('/', userController.createUser)

@@ -150,6 +150,7 @@ const userController = {
 
             const {
                 password: hashedPassword,
+                id,
                 firstName,
                 lastName,
                 contactNumber,
@@ -162,6 +163,7 @@ const userController = {
 
             const token = jwt.sign(
                 {
+                    id,
                     firstName,
                     lastName,
                     emailAddress,
@@ -174,6 +176,33 @@ const userController = {
             res.json({ token })
         } catch (error) {
             console.error('🦝 Error @ Sign In: ', error);
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    getCurrentUser: async (req, res, next) => {
+        try {
+
+            if (req.params.id !== "current-user") {
+                next()
+                return;
+            }
+
+            const { authorization } = req.headers;
+
+            const token = authorization.split(" ")[1];
+
+            if (!token) throw new Error("Token is required");
+
+            const currentUser = jwt.verify(token, JWT_PRIVATE_KEY);
+
+            const currentUserDetails = await User.findById(currentUser.id).populate("contacts");
+
+            res.json({
+                data: currentUserDetails
+            });
+        } catch (error) {
+            console.error('🦝 Error @ Delete Middleware: ', error);
             res.status(500).json({ message: error.message });
         }
     },
